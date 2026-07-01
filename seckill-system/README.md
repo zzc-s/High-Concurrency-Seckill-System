@@ -390,9 +390,45 @@ seckill-system/             # Maven 根目录（IDEA Open 此目录）
 
 > 若仓库外层还有 `High-Concurrency Seckill System` 等父文件夹，**不要**将其作为 IDEA 项目根打开。
 
-## Publish to GitHub
+## 面试常见问题
 
-上传前确认 `.gitignore` 已生效，仓库中不应包含 `node_modules/`、`target/`、`report/`、`result.jtl`、`deploy/jmeter/users.csv` 等本地产物与敏感文件。
+### 为什么用 Redis 扣库存，而不是直接改 MySQL？
+
+秒杀瞬间 QPS 很高，直接打 MySQL 容易成为瓶颈。本项目在 Redis 中用 **Lua 脚本**（`lua/stock_deduct.lua`）原子完成「查库存 → 判重 → 扣减 → 记录已购用户」，保证并发下不超卖；MySQL 落库放在 **MQ 异步消费** 阶段，降低数据库峰值压力。
+
+### RabbitMQ 在这里起什么作用？
+
+**削峰填谷。** 秒杀请求先在 Redis 预扣库存并写入待处理订单，再通过 RabbitMQ 投递 `OrderMessage`；消费者按 **Redisson 令牌桶限速（约 200 QPS）** 落库，避免瞬时流量打满数据库。
+
+### 如何保证不超卖？
+
+多层保障：
+
+1. **Redis Lua**：库存扣减与「用户是否已买」在同一脚本内原子执行  
+2. **唯一约束**：`seckill_order` 表 `(user_id, product_id)` 唯一，防止重复下单  
+3. **MQ 消费**：Redisson **分布式锁** 互斥落库，`deductStock` 带 `stock > 0` 条件更新  
+4. **压测验收**：JMeter 并发后 MySQL 成功订单数 **≤ 秒杀库存（100）**
+
+### 网关层做了哪些防护？
+
+Spring Cloud Gateway（`SeckillGatewayFilters`）：
+
+- **鉴权**：秒杀接口需 JWT，无 Token 返回 **401**  
+- **限流 / 防刷**：令牌桶 + IP / 用户 / 请求指纹，恶意流量返回 **429**  
+- JMeter 脚本中 45 个无 Token 请求即用于验证上述拦截
+
+### 压测报告 Error% 很高，算失败吗？
+
+**不一定。** 轻量脚本 `seckill-50users-100stock.jmx` 含 **45 恶意 + 5 合法** 请求，JMeter 将非 2xx 计为 FAIL，401/429 属于**预期拦截**。验收以 **MySQL 成功订单 ≤ 库存**、合法请求能返回 200 为准。
+
+### 如果 Redis 扣了库存但 MQ 消费失败怎么办？
+
+订单初始状态为「待处理」；消费失败或 DB 库存不足时会 **标记订单失败** 并 **回滚 Redis**（库存 +1、移除已购标记），见 `SeckillService.failOrder` / `rollbackRedis`。
+
+### 为什么开发环境 MySQL 用 3307 端口？
+
+Docker 映射 **3307→3306**，避免与宿主机已有 MySQL（3306）冲突；本地 `application.yml` 默认连 `localhost:3307`。
+
 
 ## License
 
