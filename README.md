@@ -390,9 +390,6 @@ seckill-system/             # Maven 根目录（IDEA Open 此目录）
 
 > 若仓库外层还有 `High-Concurrency Seckill System` 等父文件夹，**不要**将其作为 IDEA 项目根打开。
 
-## Publish to GitHub
-
-上传前确认 `.gitignore` 已生效，仓库中不应包含 `node_modules/`、`target/`、`report/`、`result.jtl`、`deploy/jmeter/users.csv` 等本地产物与敏感文件。
 
 ## License
 
