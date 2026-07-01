@@ -15,7 +15,7 @@ hs_err_pid*.log
 replay_pid*.log
 
 # IDE
-..idea/*
+.idea/*
 !.idea/runConfigurations/
 .vscode/
 *.iml
