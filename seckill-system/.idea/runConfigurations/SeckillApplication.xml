@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SeckillApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="seckill-backend" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="ALTERNATIVE_JRE_PATH" value="corretto-17" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.seckill.SeckillApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="GatewayApplication" run_configuration_type="SpringBootApplicationConfigurationType">
+        <option name="blockRun" value="false" />
+      </option>
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Frontend Dev" run_configuration_type="js.build_tools.npm">
+        <option name="blockRun" value="false" />
+      </option>
+    </method>
+  </configuration>
+</component>
