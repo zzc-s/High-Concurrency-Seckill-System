@@ -1,0 +1,35 @@
+# Maven
+target/
+*.jar
+*.war
+*.class
+
+# Node
+node_modules/
+dist/
+*.local
+
+# Logs & JVM crash dumps
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+
+# JMeter results
+result.jtl
+report/
+deploy/jmeter/users.csv

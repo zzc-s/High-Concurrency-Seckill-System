@@ -1,0 +1,25 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: seckill-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: seckill-backend
+          uri: ${BACKEND_URI:http://localhost:8080}
+          predicates:
+            - Path=/api/**
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+seckill:
+  gateway:
+    token-bucket-rate: 50
+    ip-limit-per-second: 10
+    user-limit-per-second: 10
+    blacklist-ttl-seconds: 60
+    fingerprint-ttl-seconds: 3

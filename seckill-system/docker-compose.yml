@@ -1,0 +1,79 @@
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: deploy/mysql/Dockerfile
+    container_name: seckill-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: seckill123
+      MYSQL_DATABASE: seckill
+    ports:
+      - "3307:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: seckill-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: seckill-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+
+  seckill-app:
+    build:
+      context: .
+      dockerfile: seckill-backend/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: seckill123
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+      JWT_SECRET: seckill-jwt-secret-key-2024-very-long-string
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
+  seckill-gateway:
+    build:
+      context: .
+      dockerfile: seckill-gateway/Dockerfile
+    container_name: seckill-gateway
+    ports:
+      - "9000:9000"
+    environment:
+      BACKEND_URI: http://seckill-app:8080
+      REDIS_HOST: redis
+    depends_on:
+      - redis
+      - seckill-app
+
+  nginx:
+    image: nginx:alpine
+    container_name: seckill-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./seckill-frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - seckill-gateway
+
+# 集群部署: docker compose up -d --scale seckill-app=2
