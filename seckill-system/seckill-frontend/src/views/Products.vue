@@ -2,7 +2,7 @@
   <div class="products-page">
     <h2>秒杀商品</h2>
     <el-row :gutter="20">
-      <el-col :span="8" v-for="p in products" :key="p.id">
+      <el-col :xs="24" :sm="12" :md="8" v-for="p in products" :key="p.id">
         <el-card shadow="hover" class="product-card">
           <h3>{{ p.name }}</h3>
           <p class="price">¥{{ p.price }}</p>
@@ -32,4 +32,8 @@ h2 { margin-bottom: 24px; color: #1a1a2e; }
 .product-card { margin-bottom: 20px; text-align: center; }
 .price { font-size: 28px; color: #e94560; margin: 12px 0; }
 .stock { color: #666; margin-bottom: 16px; }
+@media (max-width: 768px) {
+  .products-page { padding: 0 12px; }
+  h2 { font-size: 20px; }
+}
 </style>

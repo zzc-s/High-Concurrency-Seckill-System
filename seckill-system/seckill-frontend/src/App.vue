@@ -51,7 +51,39 @@ onUnmounted(() => {
 body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; }
 .layout { min-height: 100vh; }
 .header { display: flex; align-items: center; background: #1a1a2e; padding: 0 20px; }
-.logo { color: #e94560; font-size: 22px; font-weight: bold; margin-right: 40px; }
+.logo {
+  color: #e94560;
+  font-size: 22px;
+  font-weight: bold;
+  margin-right: 40px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .flex-grow { flex-grow: 1; }
 .el-header { height: 60px !important; }
+
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    height: auto !important;
+  }
+  .el-header {
+    height: auto !important;
+  }
+  .logo {
+    width: 100%;
+    font-size: 18px;
+    margin-right: 0;
+    margin-bottom: 4px;
+  }
+  .header .el-menu {
+    width: 100%;
+    border-bottom: none;
+  }
+  .header .el-menu-item {
+    padding: 0 12px;
+    font-size: 14px;
+  }
+}
 </style>

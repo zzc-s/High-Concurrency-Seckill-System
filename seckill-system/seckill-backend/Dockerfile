@@ -2,6 +2,7 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY seckill-backend/pom.xml seckill-backend/
+COPY seckill-gateway/pom.xml seckill-gateway/
 COPY seckill-backend/src seckill-backend/src
 RUN mvn -pl seckill-backend -am package -DskipTests -q
 
